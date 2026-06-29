@@ -17,5 +17,6 @@ async def get_db() -> AsyncSession:
 
 
 async def init_db():
+    from app.models import ticket, knowledge  # noqa: F401 — registers models with Base
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)

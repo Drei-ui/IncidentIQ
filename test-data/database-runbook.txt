@@ -1,0 +1,36 @@
+Database Issues - Runbook
+
+OVERVIEW
+Covers connection timeouts, slow queries, replication lag, and disk space issues.
+
+SYMPTOMS & FIXES
+
+Issue: Application returning DB connection timeout errors
+1. Check active connections: SELECT count(*) FROM pg_stat_activity;
+2. Check max connections: SHOW max_connections;
+3. Kill idle connections older than 10 minutes:
+   SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE state = 'idle' AND query_start < NOW() - INTERVAL '10 minutes';
+4. Increase connection pool size in app config if recurring
+5. Consider enabling PgBouncer if not already in use
+
+Issue: Slow query causing timeouts
+1. Find slow queries: SELECT query, mean_exec_time FROM pg_stat_statements ORDER BY mean_exec_time DESC LIMIT 10;
+2. Run EXPLAIN ANALYZE on the offending query
+3. Check for missing indexes: look for Seq Scan on large tables
+4. Add index if needed: CREATE INDEX CONCURRENTLY idx_name ON table(column);
+
+Issue: Replication lag on read replica
+1. Check lag: SELECT now() - pg_last_xact_replay_timestamp() AS replication_lag;
+2. If lag > 60 seconds, route all reads to primary temporarily
+3. Check replica disk I/O: iostat -x 5 3
+4. Notify DBA team if lag exceeds 5 minutes
+
+Issue: Disk space warning (>85% used)
+1. Check disk usage: df -h /var/lib/postgresql
+2. Find large tables: SELECT relname, pg_size_pretty(pg_total_relation_size(relid)) FROM pg_catalog.pg_statio_user_tables ORDER BY pg_total_relation_size(relid) DESC LIMIT 10;
+3. Run VACUUM to reclaim space: VACUUM ANALYZE;
+4. Archive old logs if needed
+5. Alert infra team to expand volume if < 10GB free
+
+ESCALATION
+Escalate immediately if: primary DB is unreachable, replication is broken for > 10 minutes, or disk is > 95% full.

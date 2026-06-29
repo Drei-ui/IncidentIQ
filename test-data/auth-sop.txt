@@ -1,0 +1,44 @@
+Authentication & Login Issues - Standard Operating Procedure
+
+OVERVIEW
+This SOP covers the most common authentication failures reported by users including login errors, password reset failures, session expiry, and token invalidation.
+
+COMMON CAUSES
+1. Expired or invalid JWT tokens
+2. Redis cache holding stale session data
+3. Auth service unresponsive or crashed
+4. Database connection pool exhausted
+5. Password hash mismatch after forced reset
+6. Browser caching old credentials
+
+TROUBLESHOOTING STEPS
+
+Issue: User cannot login after password reset
+1. Ask user to clear browser cache and cookies
+2. Check Redis for stale session: redis-cli GET session:<user_id>
+3. Flush user session: redis-cli DEL session:<user_id>
+4. Verify password hash updated in DB: SELECT password_hash, updated_at FROM users WHERE email = '<email>'
+5. Restart Auth Service if hash looks correct but login still fails
+6. Ask user to try incognito/private browser window
+
+Issue: "Invalid Credentials" error despite correct password
+1. Check if account is locked: SELECT locked_at, failed_attempts FROM users WHERE email = '<email>'
+2. Unlock account if needed: UPDATE users SET locked_at = NULL, failed_attempts = 0 WHERE email = '<email>'
+3. Check auth service logs for bcrypt errors
+4. Verify the correct environment DB is being hit (staging vs production)
+
+Issue: Session expires too quickly
+1. Check JWT expiry config: cat /etc/app/auth.config | grep TOKEN_EXPIRY
+2. Default should be 24h for web, 30d for mobile
+3. Check if clock skew between services exceeds 5 minutes
+4. Sync NTP if needed: ntpdate -u pool.ntp.org
+
+Issue: Auth service returning 500
+1. Check auth service health: curl http://auth-service:8080/health
+2. Check logs: kubectl logs -n production deployment/auth-service --tail=100
+3. Check DB connection pool: SELECT count(*) FROM pg_stat_activity WHERE datname = 'auth_db'
+4. Restart if pool is exhausted: kubectl rollout restart deployment/auth-service -n production
+
+ESCALATION
+- Escalate to Senior Engineer if: issue affects more than 5 users simultaneously, DB corruption suspected, or auth service cannot restart cleanly.
+- SLA: P1 (>10 users affected) = 15 min response. P2 (1-10 users) = 2 hour response.
