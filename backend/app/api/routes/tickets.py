@@ -12,7 +12,7 @@ from app.services.email import send_critical_ticket_alert
 router = APIRouter()
 
 
-@router.get("/", response_model=list[TicketResponse])
+@router.get("", response_model=list[TicketResponse])
 async def list_tickets(
     status: str | None = None,
     limit: int = 50,
@@ -25,7 +25,7 @@ async def list_tickets(
     return result.scalars().all()
 
 
-@router.post("/", response_model=TicketResponse, status_code=201)
+@router.post("", response_model=TicketResponse, status_code=201)
 async def create_ticket(
     payload: TicketCreate,
     db: AsyncSession = Depends(get_db),

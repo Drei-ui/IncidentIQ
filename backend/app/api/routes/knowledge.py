@@ -42,7 +42,7 @@ async def upload_document(
     return KnowledgeUploadResponse(document_name=file.filename, chunks_created=len(chunks))
 
 
-@router.get("/", response_model=list[KnowledgeChunkResponse])
+@router.get("", response_model=list[KnowledgeChunkResponse])
 async def list_documents(db: AsyncSession = Depends(get_db)):
     from sqlalchemy import select, distinct
     result = await db.execute(

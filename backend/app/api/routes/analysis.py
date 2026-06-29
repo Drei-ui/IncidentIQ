@@ -15,7 +15,7 @@ class AnalysisRequest(BaseModel):
     description: str
 
 
-@router.post("/", response_model=AnalysisResponse)
+@router.post("", response_model=AnalysisResponse)
 async def run_analysis(
     payload: AnalysisRequest,
     db: AsyncSession = Depends(get_db),
