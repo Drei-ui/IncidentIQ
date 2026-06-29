@@ -31,6 +31,7 @@ export function KnowledgeUpload() {
   const { data: docs = [] } = useQuery<KnowledgeDoc[]>({
     queryKey: ["knowledge"],
     queryFn: () => api.get("/knowledge").then((r) => r.data),
+    staleTime: 0,
   });
 
   const mutation = useMutation({
