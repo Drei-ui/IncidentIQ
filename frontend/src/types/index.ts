@@ -33,6 +33,29 @@ export interface RelatedDocument {
   similarity_score: number;
 }
 
+export interface DetectedIssue {
+  type: string;
+  count: number | null;
+  timeframe: string | null;
+  detail: string | null;
+}
+
+export interface TicketSuggestion {
+  title: string;
+  description: string;
+  priority: string;
+}
+
+export interface LogAnalysisResult {
+  detected_issues: DetectedIssue[];
+  most_likely_cause: string;
+  affected_service: string;
+  severity: string;
+  suggested_actions: string[];
+  raw_errors: string[];
+  ticket_suggestion: TicketSuggestion;
+}
+
 export interface KnowledgeDoc {
   id: string;
   document_name: string;

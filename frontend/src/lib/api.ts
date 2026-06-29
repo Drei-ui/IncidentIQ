@@ -30,3 +30,9 @@ export async function uploadKnowledge(file: File, documentType: string) {
   form.append("document_type", documentType);
   return api.post("/knowledge/upload", form).then((r) => r.data);
 }
+
+export async function analyzeLog(file: File) {
+  const form = new FormData();
+  form.append("file", file);
+  return api.post("/logs/analyze", form).then((r) => r.data);
+}

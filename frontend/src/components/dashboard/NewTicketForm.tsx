@@ -9,12 +9,13 @@ import { Loader2, CheckCircle } from "lucide-react";
 
 interface Props {
   onSubmitted?: () => void;
+  prefill?: { title: string; description: string; priority: string };
 }
 
-export function NewTicketForm({ onSubmitted }: Props) {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [priority, setPriority] = useState("medium");
+export function NewTicketForm({ onSubmitted, prefill }: Props) {
+  const [title, setTitle] = useState(prefill?.title ?? "");
+  const [description, setDescription] = useState(prefill?.description ?? "");
+  const [priority, setPriority] = useState(prefill?.priority ?? "medium");
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const queryClient = useQueryClient();
 

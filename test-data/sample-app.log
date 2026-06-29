@@ -1,0 +1,39 @@
+2026-06-29 04:10:01 INFO  [AuthService] Application started on port 8080
+2026-06-29 04:11:03 INFO  [AuthService] User login successful: user_id=1042
+2026-06-29 04:12:15 INFO  [AuthService] User login successful: user_id=1087
+2026-06-29 04:13:22 INFO  [DBPool] Connection pool status: 8/20 active
+2026-06-29 04:20:01 INFO  [AuthService] User login successful: user_id=2201
+2026-06-29 04:30:00 INFO  [DBPool] Connection pool status: 12/20 active
+2026-06-29 04:35:11 WARN  [DBPool] Connection pool at 80% capacity: 16/20 active
+2026-06-29 04:35:45 ERROR [DBPool] Connection pool exhausted: 20/20 active, waiting for available connection
+2026-06-29 04:35:46 ERROR [AuthService] Database timeout after 30000ms - failed to acquire connection
+2026-06-29 04:35:46 ERROR [AuthService] User login failed: user_id=3301 - java.sql.SQLException: Timeout waiting for connection from pool
+2026-06-29 04:35:47 ERROR [DBPool] Connection pool exhausted: 20/20 active, waiting for available connection
+2026-06-29 04:35:47 ERROR [AuthService] Database timeout after 30000ms - failed to acquire connection
+2026-06-29 04:35:47 ERROR [AuthService] User login failed: user_id=3302 - java.sql.SQLException: Timeout waiting for connection from pool
+2026-06-29 04:35:48 ERROR [DBPool] Connection pool exhausted: 20/20 active, waiting for available connection
+2026-06-29 04:35:48 ERROR [AuthService] Database timeout after 30000ms - failed to acquire connection
+2026-06-29 04:35:49 ERROR [APIGateway] HTTP 500 /api/v1/auth/login - upstream timeout from auth-service
+2026-06-29 04:35:50 ERROR [APIGateway] HTTP 500 /api/v1/auth/login - upstream timeout from auth-service
+2026-06-29 04:35:51 ERROR [APIGateway] HTTP 500 /api/v1/auth/login - upstream timeout from auth-service
+2026-06-29 04:35:52 ERROR [DBPool] Connection pool exhausted: 20/20 active, waiting for available connection
+2026-06-29 04:35:52 ERROR [AuthService] Database timeout after 30000ms - failed to acquire connection
+2026-06-29 04:35:53 ERROR [APIGateway] HTTP 500 /api/v1/auth/login - upstream timeout from auth-service
+2026-06-29 04:35:54 ERROR [DBPool] java.sql.SQLException: Timeout waiting for connection from pool
+    at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:213)
+    at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:128)
+    at com.example.auth.repository.UserRepository.findByEmail(UserRepository.java:45)
+2026-06-29 04:35:55 ERROR [APIGateway] HTTP 500 /api/v1/profile - upstream timeout from auth-service
+2026-06-29 04:35:56 ERROR [APIGateway] HTTP 500 /api/v1/auth/logout - upstream timeout from auth-service
+2026-06-29 04:35:57 WARN  [AuthService] 47 requests queued waiting for DB connection
+2026-06-29 04:36:00 ERROR [DBPool] Connection pool exhausted: 20/20 active
+2026-06-29 04:36:01 ERROR [APIGateway] HTTP 500 /api/v1/auth/login - upstream timeout from auth-service
+2026-06-29 04:36:02 ERROR [APIGateway] HTTP 500 /api/v1/auth/login - upstream timeout from auth-service
+2026-06-29 04:36:10 WARN  [AuthService] High error rate detected: 89% of requests failing
+2026-06-29 04:36:15 INFO  [DBPool] Attempting emergency connection pool expansion to 30
+2026-06-29 04:36:16 ERROR [DBPool] Failed to expand pool - max server connections reached
+2026-06-29 04:37:00 INFO  [Ops] Manual intervention: killing idle DB connections
+2026-06-29 04:37:05 INFO  [DBPool] Connection pool recovering: 14/20 active
+2026-06-29 04:37:10 INFO  [AuthService] Service recovering, error rate dropping
+2026-06-29 04:38:00 INFO  [DBPool] Connection pool normal: 9/20 active
+2026-06-29 04:38:05 INFO  [AuthService] Service fully recovered

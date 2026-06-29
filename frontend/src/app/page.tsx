@@ -6,20 +6,34 @@ import { TicketList } from "@/components/dashboard/TicketList";
 import { NewTicketForm } from "@/components/dashboard/NewTicketForm";
 import { KnowledgeUpload } from "@/components/dashboard/KnowledgeUpload";
 import { TicketDialog } from "@/components/dashboard/TicketDialog";
+import { LogAnalysis } from "@/components/dashboard/LogAnalysis";
 import { type Ticket } from "@/types";
 import { Zap } from "lucide-react";
 
-type Tab = "tickets" | "new" | "knowledge";
+type Tab = "tickets" | "new" | "knowledge" | "logs";
+
+interface PrefillTicket {
+  title: string;
+  description: string;
+  priority: string;
+}
 
 export default function Home() {
   const [tab, setTab] = useState<Tab>("tickets");
   const [selected, setSelected] = useState<Ticket | null>(null);
+  const [prefill, setPrefill] = useState<PrefillTicket | null>(null);
 
   const tabs: { id: Tab; label: string }[] = [
     { id: "tickets", label: "Tickets" },
     { id: "new", label: "New Ticket" },
     { id: "knowledge", label: "Knowledge Base" },
+    { id: "logs", label: "Log Analysis" },
   ];
+
+  const handleCreateFromLog = (title: string, description: string, priority: string) => {
+    setPrefill({ title, description, priority });
+    setTab("new");
+  };
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 flex flex-col gap-8">
@@ -55,8 +69,14 @@ export default function Home() {
 
       <div>
         {tab === "tickets" && <TicketList onSelect={setSelected} />}
-        {tab === "new" && <NewTicketForm onSubmitted={() => setTab("tickets")} />}
+        {tab === "new" && (
+          <NewTicketForm
+            prefill={prefill ?? undefined}
+            onSubmitted={() => { setTab("tickets"); setPrefill(null); }}
+          />
+        )}
         {tab === "knowledge" && <KnowledgeUpload />}
+        {tab === "logs" && <LogAnalysis onCreateTicket={handleCreateFromLog} />}
       </div>
 
       {selected && (
