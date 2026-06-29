@@ -32,10 +32,10 @@ async def analyze_ticket(
     similar_tickets_result = await db.execute(
         text("""
             SELECT id, title, description, resolution,
-                   1 - (embedding <=> :embedding::vector) AS score
+                   1 - (embedding <=> CAST(:embedding AS vector)) AS score
             FROM tickets
             WHERE embedding IS NOT NULL
-            ORDER BY embedding <=> :embedding::vector
+            ORDER BY embedding <=> CAST(:embedding AS vector)
             LIMIT 5
         """),
         {"embedding": embedding_str},
@@ -45,10 +45,10 @@ async def analyze_ticket(
     related_docs_result = await db.execute(
         text("""
             SELECT id, document_name, content,
-                   1 - (embedding <=> :embedding::vector) AS score
+                   1 - (embedding <=> CAST(:embedding AS vector)) AS score
             FROM knowledge_chunks
             WHERE embedding IS NOT NULL
-            ORDER BY embedding <=> :embedding::vector
+            ORDER BY embedding <=> CAST(:embedding AS vector)
             LIMIT 5
         """),
         {"embedding": embedding_str},
@@ -76,7 +76,15 @@ async def analyze_ticket(
         messages=[{"role": "user", "content": user_message}],
     )
 
-    ai_result = json.loads(response.content[0].text)
+    raw_text = response.content[0].text.strip()
+    # Strip markdown code fences if Claude wraps the JSON
+    if raw_text.startswith("```"):
+        raw_text = raw_text.split("```")[1]
+        if raw_text.startswith("json"):
+            raw_text = raw_text[4:]
+        raw_text = raw_text.strip()
+
+    ai_result = json.loads(raw_text)
 
     return AnalysisResponse(
         possible_cause=ai_result["possible_cause"],

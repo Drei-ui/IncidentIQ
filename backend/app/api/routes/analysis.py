@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends
+import traceback
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -19,4 +20,7 @@ async def run_analysis(
     payload: AnalysisRequest,
     db: AsyncSession = Depends(get_db),
 ):
-    return await analyze_ticket(payload.title, payload.description, db)
+    try:
+        return await analyze_ticket(payload.title, payload.description, db)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"{type(e).__name__}: {e}\n{traceback.format_exc()}")
