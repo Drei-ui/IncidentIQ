@@ -5,9 +5,13 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createTicket, analyzeTicket } from "@/lib/api";
 import { type AnalysisResult } from "@/types";
 import { AnalysisPanel } from "./AnalysisPanel";
-import { Loader2 } from "lucide-react";
+import { Loader2, CheckCircle } from "lucide-react";
 
-export function NewTicketForm() {
+interface Props {
+  onSubmitted?: () => void;
+}
+
+export function NewTicketForm({ onSubmitted }: Props) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("medium");
@@ -19,6 +23,12 @@ export function NewTicketForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tickets"] });
       queryClient.invalidateQueries({ queryKey: ["stats"] });
+      setTitle("");
+      setDescription("");
+      setPriority("medium");
+      setAnalysis(null);
+      // Redirect to tickets list after short delay so user sees the success flash
+      setTimeout(() => onSubmitted?.(), 1200);
     },
   });
 
@@ -31,13 +41,6 @@ export function NewTicketForm() {
     e.preventDefault();
     if (!title.trim() || !description.trim()) return;
     analyzeMutation.mutate();
-  };
-
-  const handleSubmit = () => {
-    createMutation.mutate();
-    setTitle("");
-    setDescription("");
-    setAnalysis(null);
   };
 
   return (
@@ -79,29 +82,35 @@ export function NewTicketForm() {
         </div>
         <button
           type="submit"
-          disabled={analyzeMutation.isPending}
+          disabled={analyzeMutation.isPending || createMutation.isPending}
           className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-medium rounded-lg px-4 py-2.5 transition-colors"
         >
-          {analyzeMutation.isPending ? (
-            <><Loader2 className="w-4 h-4 animate-spin" /> Analyzing...</>
-          ) : (
-            "Analyze with AI"
-          )}
+          {analyzeMutation.isPending
+            ? <><Loader2 className="w-4 h-4 animate-spin" /> Analyzing...</>
+            : "Analyze with AI"
+          }
         </button>
       </form>
 
       {analysis && (
         <>
           <AnalysisPanel analysis={analysis} />
-          <button
-            onClick={handleSubmit}
-            disabled={createMutation.isPending}
-            className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-medium rounded-lg px-4 py-2.5 transition-colors"
-          >
-            {createMutation.isPending ? "Submitting..." : "Submit Ticket"}
-          </button>
-          {createMutation.isSuccess && (
-            <p className="text-emerald-400 text-sm text-center">Ticket submitted successfully.</p>
+          {createMutation.isSuccess ? (
+            <div className="flex items-center justify-center gap-2 text-emerald-400 text-sm py-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+              <CheckCircle className="w-4 h-4" />
+              Ticket submitted — redirecting to ticket list…
+            </div>
+          ) : (
+            <button
+              onClick={() => createMutation.mutate()}
+              disabled={createMutation.isPending}
+              className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-medium rounded-lg px-4 py-2.5 transition-colors"
+            >
+              {createMutation.isPending
+                ? <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</>
+                : "Submit Ticket"
+              }
+            </button>
           )}
         </>
       )}

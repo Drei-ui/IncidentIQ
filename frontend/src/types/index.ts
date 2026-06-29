@@ -33,6 +33,15 @@ export interface RelatedDocument {
   similarity_score: number;
 }
 
+export interface KnowledgeDoc {
+  id: string;
+  document_name: string;
+  document_type: string;
+  content: string;
+  chunk_index: number;
+  created_at: string;
+}
+
 export interface AnalysisResult {
   possible_cause: string;
   confidence: number;
