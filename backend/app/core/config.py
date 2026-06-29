@@ -13,6 +13,11 @@ class Settings(BaseSettings):
     EMBEDDING_MODEL: str = "BAAI/bge-small-en-v1.5"
     VECTOR_DIMENSIONS: int = 384
 
+    # Email (Resend)
+    RESEND_API_KEY: str = ""
+    ALERT_EMAIL_TO: str = ""
+    ALERT_EMAIL_FROM: str = "IncidentIQ <alerts@incidentiq.dev>"
+
     # App
     ALLOWED_ORIGINS: list[str] = ["http://localhost:3000"]
 
