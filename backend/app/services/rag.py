@@ -1,4 +1,5 @@
-from openai import AsyncOpenAI
+import json
+import anthropic
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -6,7 +7,7 @@ from app.core.config import settings
 from app.schemas.analysis import AnalysisResponse, SimilarTicket, RelatedDocument
 from app.services.embedding import embed
 
-client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
 
 SYSTEM_PROMPT = """You are an expert support engineer. Given a support ticket and relevant context,
 provide a structured analysis. Be concise and actionable.
@@ -25,8 +26,7 @@ async def analyze_ticket(
     description: str,
     db: AsyncSession,
 ) -> AnalysisResponse:
-    query_text = f"{title}\n{description}"
-    query_embedding = await embed(query_text)
+    query_embedding = embed(f"{title}\n{description}")
     embedding_str = f"[{','.join(str(v) for v in query_embedding)}]"
 
     similar_tickets_result = await db.execute(
@@ -67,21 +67,16 @@ async def analyze_ticket(
             context_parts.append(f"- [{row.document_name}]: {row.content[:300]}")
 
     context = "\n".join(context_parts)
-
     user_message = f"Ticket: {title}\n\nDescription: {description}\n\nContext:\n{context}"
 
-    import json
-    response = await client.chat.completions.create(
+    response = client.messages.create(
         model=settings.LLM_MODEL,
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": user_message},
-        ],
-        response_format={"type": "json_object"},
-        temperature=0.2,
+        max_tokens=1024,
+        system=SYSTEM_PROMPT,
+        messages=[{"role": "user", "content": user_message}],
     )
 
-    ai_result = json.loads(response.choices[0].message.content)
+    ai_result = json.loads(response.content[0].text)
 
     return AnalysisResponse(
         possible_cause=ai_result["possible_cause"],

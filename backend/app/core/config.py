@@ -5,14 +5,16 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/incidentiq"
 
-    # OpenAI
-    OPENAI_API_KEY: str = ""
-    EMBEDDING_MODEL: str = "text-embedding-3-small"
-    LLM_MODEL: str = "gpt-4o-mini"
+    # Anthropic
+    ANTHROPIC_API_KEY: str = ""
+    LLM_MODEL: str = "claude-haiku-4-5-20251001"
+
+    # Embeddings (fastembed — runs locally, no API key needed)
+    EMBEDDING_MODEL: str = "BAAI/bge-small-en-v1.5"
+    VECTOR_DIMENSIONS: int = 384
 
     # App
     ALLOWED_ORIGINS: list[str] = ["http://localhost:3000"]
-    VECTOR_DIMENSIONS: int = 1536
 
     class Config:
         env_file = ".env"

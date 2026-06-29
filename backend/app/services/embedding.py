@@ -1,20 +1,13 @@
-from openai import AsyncOpenAI
+from fastembed import TextEmbedding
 from app.core.config import settings
 
-client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+# Loaded once at module level — model is cached to disk after first download (~45MB)
+_model = TextEmbedding(model_name=settings.EMBEDDING_MODEL)
 
 
-async def embed(text: str) -> list[float]:
-    response = await client.embeddings.create(
-        model=settings.EMBEDDING_MODEL,
-        input=text,
-    )
-    return response.data[0].embedding
+def embed(text: str) -> list[float]:
+    return next(_model.embed([text])).tolist()
 
 
-async def embed_batch(texts: list[str]) -> list[list[float]]:
-    response = await client.embeddings.create(
-        model=settings.EMBEDDING_MODEL,
-        input=texts,
-    )
-    return [item.embedding for item in response.data]
+def embed_batch(texts: list[str]) -> list[list[float]]:
+    return [v.tolist() for v in _model.embed(texts)]

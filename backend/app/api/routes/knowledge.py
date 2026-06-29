@@ -27,7 +27,7 @@ async def upload_document(
     if not chunks:
         raise HTTPException(status_code=400, detail="File appears to be empty")
 
-    embeddings = await embed_batch(chunks)
+    embeddings = embed_batch(chunks)
 
     for i, (chunk, embedding) in enumerate(zip(chunks, embeddings)):
         db.add(KnowledgeChunk(

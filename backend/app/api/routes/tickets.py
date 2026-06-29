@@ -29,7 +29,7 @@ async def create_ticket(
     db: AsyncSession = Depends(get_db),
 ):
     ticket = Ticket(**payload.model_dump())
-    ticket.embedding = await embed(f"{payload.title}\n{payload.description}")
+    ticket.embedding = embed(f"{payload.title}\n{payload.description}")
     db.add(ticket)
     await db.commit()
     await db.refresh(ticket)
