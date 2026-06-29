@@ -19,7 +19,11 @@ class Settings(BaseSettings):
     ALERT_EMAIL_FROM: str = "IncidentIQ <alerts@incidentiq.dev>"
 
     # App
-    ALLOWED_ORIGINS: list[str] = ["http://localhost:3000"]
+    ALLOWED_ORIGINS: list[str] = [
+        "http://localhost:3000",
+        "https://incidentiq-gray.vercel.app",
+        "https://*.vercel.app",
+    ]
 
     class Config:
         env_file = ".env"
