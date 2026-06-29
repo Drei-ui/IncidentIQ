@@ -7,7 +7,7 @@ const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 // Auth is disabled locally when Supabase env vars are not set
 const AUTH_ENABLED = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   if (!AUTH_ENABLED) return NextResponse.next({ request });
 
   let supabaseResponse = NextResponse.next({ request });
