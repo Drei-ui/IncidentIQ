@@ -9,11 +9,11 @@ export async function getStats() {
 }
 
 export async function getTickets(status?: string) {
-  return api.get("/tickets/", { params: status ? { status } : {} }).then((r) => r.data);
+  return api.get("/tickets", { params: status ? { status } : {} }).then((r) => r.data);
 }
 
 export async function createTicket(data: { title: string; description: string; priority: string }) {
-  return api.post("/tickets/", data).then((r) => r.data);
+  return api.post("/tickets", data).then((r) => r.data);
 }
 
 export async function updateTicket(id: string, data: object) {
@@ -21,7 +21,7 @@ export async function updateTicket(id: string, data: object) {
 }
 
 export async function analyzeTicket(title: string, description: string) {
-  return api.post("/analysis/", { title, description }).then((r) => r.data);
+  return api.post("/analysis", { title, description }).then((r) => r.data);
 }
 
 export async function uploadKnowledge(file: File, documentType: string) {
@@ -36,3 +36,6 @@ export async function analyzeLog(file: File) {
   form.append("file", file);
   return api.post("/logs/analyze", form).then((r) => r.data);
 }
+
+// Also configure axios to not follow redirects with POST (prevents 308 issues)
+api.defaults.maxRedirects = 0;
